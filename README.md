@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src="assets/wtfpc-logo.png" width="96" alt="WTFPC logo" />
+
 # WTFPC
 ### *What the Fuck is My PC Doing?*
 
@@ -25,6 +27,25 @@ any given moment — Task Manager shows you 400 rows and leaves the
 correlation to you.
 
 **WTFPC does the correlation for you, and shows its work.**
+
+## CLI or GUI — your choice
+
+Run it as a scriptable command line, or as a full desktop app. Same
+engine underneath, so the numbers always agree.
+
+<p align="center">
+  <img src="assets/gui-overview.png" width="640" alt="WTFPC desktop app — Overview page" />
+</p>
+
+The desktop app adds a **Storage** page for full-volume ownership scans,
+**Game Mode** for frame-time and telemetry capture during a play
+session, and **Ask AI** — which turns any diagnosis into a local,
+previewable report you can hand to Claude or ChatGPT for a plain-English
+explanation of what's going on, without ever leaving your machine
+unless you choose to share it.
+
+The CLI covers the same ground for scripting and automation — every
+command supports `--json` for machine-readable output.
 
 ## See it in action
 
