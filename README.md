@@ -88,8 +88,11 @@ asserted without a measurement behind it.
 You're seeing this because you've been invited into WTFPC's private beta
 ahead of its commercial release. A few things worth knowing:
 
-- Builds here are **pre-release** — signed for internal testing, not yet
-  with the production release signing identity.
+- Builds here are **pre-release and unsigned**. Windows SmartScreen will
+  warn about an unknown publisher; that is expected for this stage, and
+  every build's SHA-256 is published in `SHA256SUMS` beside it so you can
+  verify what you downloaded. Production signing arrives before general
+  availability.
 - Features and output may still change before general availability.
 - This link and the installer are for the invited test group only —
   please don't forward them outside that group.
