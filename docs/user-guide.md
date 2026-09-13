@@ -22,13 +22,27 @@ A limitation or unavailable collector is not a healthy result and is never silen
 Overview is passive. Opening it reads current local state but does not start a diagnosis, request elevation,
 contact the network, or turn on recording.
 
-Choose **Diagnose now** for a cancelable, non-elevated memory, CPU, disk, and network snapshot. Review the named
+Choose **Diagnose now** for a cancelable, non-elevated memory, CPU, disk activity, storage capacity, and network snapshot. Review the named
 limitations before relying on a conclusion. Select a finding in Diagnose to see its evidence and explanation.
+
+After a diagnosis, Overview and Diagnose show resource cards with an icon, assessment badge, measurements, and
+separate evidence coverage. Colored assessments identify findings worth reviewing; utilization bars are neutral
+measurements, not fault indicators. **Sampled** means measurements were collected but do not establish whether
+performance is healthy. Missing evidence is not shown as a healthy result. Disk activity and storage capacity
+are separate: a busy drive and a full drive are different conditions.
+
+Choose **Review … evidence** on a resource card to filter Diagnose to that resource's findings. **Show all findings**
+removes the filter. **Explain resource evidence** opens Ask AI with the already-collected resource evidence,
+without refreshing or sending it automatically. Workload attribution and process chains remain available in
+collapsed detail sections. All assessments describe the recorded snapshot, not a guarantee about current health.
 
 ## Optional continuous recording
 
 The Agent page controls a current-user scheduled task that retains historical evidence in
-`%LOCALAPPDATA%\wtfpc\wtfpc.db`.
+`%LOCALAPPDATA%\wtfpc\wtfpc.db`. By default, the installer's "Keep WTFPC recording in the
+background at logon" option ships checked, so an ordinary install already registers this task
+and starts recording before setup finishes; clearing that installer option leaves the task
+absent and behavior exactly as described below.
 
 - **Install agent** creates the task but does not pretend it is already recording.
 - **Start recording** starts the installed task.
@@ -36,6 +50,17 @@ The Agent page controls a current-user scheduled task that retains historical ev
 - **Uninstall task** removes the task and preserves collected history.
 
 If the task target, live process, and database disagree, WTFPC shows that contradiction instead of guessing.
+
+While recording, the Agent page shows live counters for samples, writes, and events, plus dropped items, uptime,
+and the age of the last sample. These auto-refresh every 10 seconds so you do not need to reload the page to see
+current activity.
+
+## History
+
+The History page turns recorded evidence into a metric and time range you choose. View it as a native chart or a
+table, whichever suits the question. Coverage gaps are shown honestly rather than smoothed over, and any anomalies
+found in the selected range are called out. History has nothing to show until the optional continuous recording
+agent has been installed and started.
 
 ## Game Mode
 
@@ -63,7 +88,10 @@ the questionable value. Card generation is local and does not open a browser or 
 
 ## Ask AI and privacy
 
-Ask AI builds a Markdown report locally. Preview it before disclosure.
+Ask AI builds a Markdown report locally. Preview it before disclosure. The page walks through four steps: Describe
+the problem, Generate preview, Review & send, and Bring back the answer. Until you choose **Generate local
+preview**, the page tells you plainly that you need to generate a preview first; there is nothing to review or
+send before that.
 
 - Full diagnostic context is the default because paths and identities can matter to diagnosis.
 - **Reduce sensitive details** aliases or removes selected paths, accounts, stable identities, command arguments,
@@ -75,6 +103,23 @@ Ask AI builds a Markdown report locally. Preview it before disclosure.
 Opening ChatGPT or Claude is an explicit third-party disclosure. WTFPC copies the report first and opens only a
 compiled HTTPS provider destination after consent. It has no provider API, response ingestion, automatic upload,
 or report history. Copy and Save remain local actions.
+
+The report asks the AI to answer under four headings: `## What I see`, `## Likely explanations`, `## What you can
+do safely`, and `## WTFPC follow-up`. The last section holds a single `WTFPC follow-up: <action-id>` line, or
+`WTFPC follow-up: none` when no further evidence is needed. Paste the reply into step 4, Bring back the answer, so
+WTFPC can read that line back.
+
+## Explain on this PC (local model)
+
+**Explain on this PC** runs a small local model against your evidence entirely on this machine: the evidence, your
+question, and the answer never leave the PC, and none of it is saved. Describe what felt wrong, then choose
+**Explain on this PC** to run it; **Cancel** stops a run in progress.
+
+If the local model is not installed yet, the page says so and offers **Download local AI**. It fetches the pinned
+model and runtime straight into the app; progress and a plain-language failure reason (insufficient disk, a
+verification mismatch, and so on) show inline, and **Check again** re-checks readiness without downloading anything.
+Once ready, the page shows which model is in use (parameter size, quantization, licence, and CPU/GPU backend) above
+the **Explain on this PC** button.
 
 ## Privileged helper verification
 
