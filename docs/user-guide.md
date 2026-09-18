@@ -55,6 +55,13 @@ While recording, the Agent page shows live counters for samples, writes, and eve
 and the age of the last sample. These auto-refresh every 10 seconds so you do not need to reload the page to see
 current activity.
 
+## Before you play
+
+Run `wtfpc pregame` before starting a game to measure current memory and VRAM headroom, sustained process I/O
+during a ten-second check, and bursts this PC recorded in its own history. `wtfpc pregame --game <name>` also
+compares current VRAM headroom with recent recorded sessions for that game. Process I/O includes file, device,
+pipe, and socket transfers; it is reported as activity, not as an instruction to close anything.
+
 ## History
 
 The History page turns recorded evidence into a metric and time range you choose. View it as a native chart or a
