@@ -31,6 +31,10 @@ measurements, not fault indicators. **Sampled** means measurements were collecte
 performance is healthy. Missing evidence is not shown as a healthy result. Disk activity and storage capacity
 are separate: a busy drive and a full drive are different conditions.
 
+When the processor is running under a performance ceiling, the CPU card adds a "CPU speed" note. When firmware
+limited the processor's speed at least once in the last 24 hours, the card also shows that count. The speed note
+appears only while a cap is in effect; "could not be read" is never shown as "none logged".
+
 Choose **Review … evidence** on a resource card to filter Diagnose to that resource's findings. **Show all findings**
 removes the filter. **Explain resource evidence** opens Ask AI with the already-collected resource evidence,
 without refreshing or sending it automatically. Workload attribution and process chains remain available in
@@ -61,6 +65,25 @@ Run `wtfpc pregame` before starting a game to measure current memory and VRAM he
 during a ten-second check, and bursts this PC recorded in its own history. `wtfpc pregame --game <name>` also
 compares current VRAM headroom with recent recorded sessions for that game. Process I/O includes file, device,
 pipe, and socket transfers; it is reported as activity, not as an instruction to close anything.
+
+`wtfpc pregame` also reports whether Windows has a restart pending, under "Windows restart state", and names each
+signal it read: Windows Update and Windows servicing. Queued file operations are listed separately at lower
+confidence, because installers set that marker routinely, and are never counted as a pending restart. A signal that
+could not be read is reported as such rather than as "no restart is pending". WTFPC only reports this state.
+
+`wtfpc pregame` also lists enabled scheduled tasks, other than those Windows owns, whose next run falls in the
+coming hour; `--task-window MINUTES` changes the window. If the scheduler cannot be read, pregame says so rather
+than reporting that nothing is scheduled. Tasks are listed as measurements, never as a suggestion to disable them.
+When a restart is pending or the CPU is capped, the closing line names those two items instead of saying nothing
+stands out, so it never contradicts the sections above it.
+
+`wtfpc pregame` and `wtfpc why cpu` both report CPU throttling: whether the processor is running under a
+performance ceiling right now, and how often firmware limited its speed in the last 24 hours (System event log,
+Kernel-Processor-Power event 37). Heat is named as the cause only when a thermal zone reports it, which is common
+on laptops and rare on desktops. Otherwise the cap is reported with its cause unknown, because a power plan or
+battery policy lowers the same counter. `wtfpc anomalies` raises a `CPU-THROTTLED` finding while a cap is in
+effect. `wtfpc status` and `wtfpc anomalies` also print the 24-hour firmware speed-limit count on a `CPU:` line, with
+"could not be read" kept distinct from "none logged". WTFPC does not change clocks, power plans or cooling.
 
 ## History
 
@@ -128,6 +151,13 @@ verification mismatch, and so on) show inline, and **Check again** re-checks rea
 Once ready, the page shows which model is in use (parameter size, quantization, licence, and CPU/GPU backend) above
 the **Explain on this PC** button.
 
+The backend is chosen automatically. A GPU (Vulkan) run is used only when the Vulkan runtime is installed, a
+hardware adapter is present, and it has enough video memory for the model and context; otherwise the run uses the
+CPU. If an automatic GPU launch fails, WTFPC retries once on the CPU. The page and the answer footer name the
+backend that actually ran and why, so a CPU run on a machine with a GPU is explained. On the command line,
+`wtfpc explain --backend auto|cpu|vulkan` sets this; `--gpu` is the same as `--backend vulkan`, cannot be combined
+with `--backend cpu` or `auto`, and a forced Vulkan run that fails is not retried.
+
 ## Privileged helper verification
 
 The Diagnose page may offer **Verify elevated frame-capture helper**. This is an action-specific identity and
@@ -159,7 +189,8 @@ uninstaller failure preserves the data.
 
 The installed CLI is `wtfpc.exe`. Use `wtfpc --help` for the exact grammar shipped in the installed version. The
 version-pinned [AI reference](ai-reference.md) lists safe evidence recipes, privilege behavior, vocabulary, and
-resource-specific limitations. There are no cleanup, tuning, process-kill, or remote-control commands.
+resource-specific limitations. `wtfpc tasks` lists registered scheduled tasks (read-only; Windows-owned tasks are
+hidden unless `--all` is given). There are no cleanup, tuning, process-kill, or remote-control commands.
 
 ## Getting useful support
 

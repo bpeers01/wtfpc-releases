@@ -25,6 +25,12 @@ is authoritative for the installed binary when this page and the installed versi
 - Storage ownership reports logical, allocated, and unique allocated sizes separately. Folder scans do not
   reconcile against whole-volume used space, and incomplete coverage is never presented as complete ownership.
 - Changes and overlapping events are co-occurrence. Timing, severity, and confidence do not prove causality.
+- CPU throttle evidence is a live performance-ceiling counter plus a 24-hour count of firmware speed limits
+  (Kernel-Processor-Power event 37). A cap with an unknown cause is not proof of heat; only a thermal-zone reading
+  supports "thermal". "Could not be read" is distinct from "none logged". Throttle figures reach the model already
+  rendered and must not be converted, and WTFPC never changes clocks, power plans, or cooling.
+- Scheduled tasks are reported as registered state and next-run times, not as a cause of slowness or advice to
+  disable them.
 - Live endpoints may appear in a current full-context report, but WTFPC never persists endpoints in SQLite.
 - Game Mode active-network rows are endpoint-free synthetic ICMP path evidence, not game packet telemetry. A
   no-reply is not a dropped game packet, and passive interface rates are not per-process or path throughput.
@@ -37,9 +43,11 @@ whether that route exists in the installed version. The CLI surfaces relevant to
 | Evidence or route | Accepted CLI surface | Privilege behavior |
 | --- | --- | --- |
 | Overview / current diagnosis | `wtfpc status`, `wtfpc capabilities`, `wtfpc anomalies [--metric memory|cpu|disk|network] [--min-severity info|low|medium|high] [--limit N]` | non-elevated |
-| Diagnose | `wtfpc why memory`, `wtfpc why cpu|disk|network [--window 1s..30s]`, `wtfpc inspect <stable-key>`; diagnostic commands also accept their documented `--json`, `--full`, and `--limit N` forms | non-elevated |
+| Diagnose | `wtfpc why memory`, `wtfpc why cpu|disk|network [--window 1s..30s]`, `wtfpc inspect <stable-key>`; diagnostic commands also accept their documented `--json`, `--full`, and `--limit N` forms; `status`, `why memory`, `why cpu`, `top memory`, and `top cpu` accept `--json --compact`, which keeps a few fields and an attribution summary per ranked row (use `inspect` for the full detail) | non-elevated |
 | Storage pressure / ownership | `wtfpc why storage`, `wtfpc storage scan [volume-or-path]`, `wtfpc top storage`; stored-evidence forms accept `--db PATH` | non-elevated; ownership scanning is explicit and read-only |
 | History / Changes | `wtfpc history <memory|cpu> [--since SPAN] [--bucket SPAN] [--entity KEY]`, `wtfpc what-changed [--since SPAN] [--entity KEY] [--kind lifecycle|software|behaviour|storage]` | read-only local evidence; storage uses retained capacity series and completed ownership summaries only |
+| Before a game | `wtfpc pregame [--game NAME] [--task-window MINUTES] [--json] [--limit N] [--db PATH]` | non-elevated; includes a ten-second live I/O check, restart state, CPU throttling, and upcoming scheduled tasks |
+| Scheduled tasks | `wtfpc tasks [--all] [--json] [--full] [--limit N]` | non-elevated, read-only; `\Microsoft\Windows\` tasks hidden unless `--all` |
 | Game Mode | `wtfpc game sessions [--limit N]`, `wtfpc game report <session> [--limit N]`, `wtfpc game what-changed <session> [--since SPAN] [--entity KEY] [--kind lifecycle|software|behaviour]` | read-only local evidence |
 | Report export | `wtfpc report [--since SPAN] [--output ABSOLUTE_PATH] [--reduce-sensitive]` | non-elevated; never launches the helper |
 | Explicit helper test | `wtfpc helper ping [--no-elevate]` | may request UAC unless `--no-elevate` is supplied |
@@ -59,6 +67,8 @@ wtfpc why storage
 wtfpc storage scan [volume-or-path]
 wtfpc top storage
 wtfpc anomalies
+wtfpc pregame
+wtfpc tasks
 wtfpc history memory --since 24h
 wtfpc history cpu --since 24h
 wtfpc what-changed --since 24h
